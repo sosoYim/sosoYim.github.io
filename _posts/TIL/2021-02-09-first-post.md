@@ -1,0 +1,44 @@
+---
+title: "자바 스프링부트에서 외부 경로 지정하기"
+date: 2021-02-09 22:34:28 -0400
+categories: TIL Java Springboot
+---
+# 자바 스프링부트에서 외부 경로를 지정하여 이미지 불러오기
+
+### 이해
+스프링을 사용하면 외부 경로를 금지시킨다. 
+즉, home.jsp 페이지로 가고싶은 경우 브라우저 링크에 localhost/home.jsp와 같이 입력해 페이지를 열 수 없다.
+jsp에서 전송되는 경로는 컨트롤러로 가며, 해당 컨트롤러에서 return한 값이 뷰 리졸버를 거쳐서 앞(경로) 뒤(확장자: .jsp) 형태로 이동시켜준다.
+
+따라서 jsp나 html에서 이미지를 불러올 때의 이미지 경로(<img href="이미지 경로">)도 특정 경로를 따로 지정한 후, 그 경로에 해당하는 물리적인 path를 정해준다.
+
+### 사용방법
+WebMvcConfigurer 을 상속하는 config 클래스를 하나 만든 후, addResourceHandlers 메서드를 오버라이드한다.
+registry.addResourceHandler("코드에서 사용할 경로")
+.addResourceLocations("물리적인 패스")
+
+### tip
+윈도우 물리 경로 : "file:///C:/messengerRepository/"
+리눅스 물리 경로 : "file:/DATA/messengerRepository/"
+
+​```html
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+@Configuration
+public class WebMvcConfig implements WebMvcConfigurer {
+	@Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/messengerFile/**")
+                .addResourceLocations("file:///C:/messengerRepository/"); 
+    }
+}
+​```
+
+### 위에서 지정한 경로로 이미지 불러오기 예시
+위의 경우에서 C 드라이브에 messengerRepository라는 폴더 아래에 있는 abc.jpg 이미지를 불러오고 싶은 경우, 다음과 같이 사용하면 된다.
+​```html
+<img src="/messengerFile/abc.jpg">
+​```
+
